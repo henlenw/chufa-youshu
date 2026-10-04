@@ -1,0 +1,3 @@
+# Copy to .dev.vars and set your own random admin password for local use.
+# Do not publish .dev.vars or reuse a production password in tests.
+ADMIN_PASSWORD=
