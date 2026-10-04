@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {generatePlan,defaultProfile,budgetTotals,validPlan,TEMPLATE_COUNT} from '../lib/product-data.ts';
+const a=generatePlan({...defaultProfile(),date:'2026-12-01'});
+assert.equal(TEMPLATE_COUNT,99);assert.equal(a.items.length,88);assert.ok(validPlan(a));assert.ok(!a.items.some(i=>i.title==='厚外套'));
+const cold=generatePlan({...a.profile,climate:'cold',housing:'rental',purpose:'work'});
+assert.ok(cold.items.some(i=>i.title==='厚外套'));assert.ok(cold.items.some(i=>i.title==='整理工作入职资料'));assert.ok(!cold.items.some(i=>i.title==='整理学校报到资料'));assert.ok(cold.items.some(i=>i.title==='确认租住交接安排'));
+a.profile.months=6;a.budget[0].amount=5000;a.budget[4].amount=4000;assert.ok(Math.abs(budgetTotals(a).total-31900)<0.0001);
+a.currency='GBP';a.rate=9;assert.ok(Math.abs(budgetTotals(a).cny-287100)<0.0001);
+const duplicate=structuredClone(a);duplicate.items.push(duplicate.items[0]);assert.equal(validPlan(duplicate),false);
+const invalid=structuredClone(a);invalid.budget[0].amount=-1;assert.equal(validPlan(invalid),false);
+assert.ok(validPlan(JSON.parse(JSON.stringify(a))));assert.equal(validPlan({}),false);
+console.log('PASS: 13 meaningful rule, budget, and backup assertions.');
